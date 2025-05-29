@@ -14,18 +14,20 @@ function renderComponent() {
         full_name: 'owner/repo-name',
         language: 'JavaScript',
         description: 'A sample repository for testing',
-        owner: 'owner',
+        owner: {
+            login: 'owner'
+        },
         name: 'repo-name',
         html_url: 'https://github.com/repo-name'
     };
 
     render(
         <MemoryRouter>
-            <RepositoriesListItem repository={repository} />
+            <RepositoriesListItem repository={repository}/>
         </MemoryRouter>
     );
 
-    return { repository };
+    return {repository};
 }
 
 test('shows a link to the github homepage for this repository', async () => {
@@ -35,6 +37,24 @@ test('shows a link to the github homepage for this repository', async () => {
 
     const link = screen.getByRole('link', {name: /github repository/i});
     expect(link).toHaveAttribute('href', repository.html_url);
+})
+
+test('shows a fileicon with appropriate icon', async () => {
+    renderComponent();
+
+    const icon = await screen.findByRole('img', {name: 'JavaScript'});
+    expect(icon).toHaveClass('js-icon');
+
+})
+
+test('show a link to the code editor page', async () => {
+    const {repository} = renderComponent();
+
+    await screen.findByRole('img', {name: 'JavaScript'});
+
+    const link = await screen.findByRole('link', {name: new RegExp(repository.owner.login)});
+    expect(link).toHaveAttribute('href', `/repositories/${repository.full_name}`);
+
 })
 
 // const pause = () => {
